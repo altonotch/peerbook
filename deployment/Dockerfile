@@ -20,6 +20,9 @@ RUN apt-get update && apt-get install -y curl && \
     curl -o chamber -LOs https://github.com/segmentio/chamber/releases/download/v2.10.6/chamber-v2.10.6-linux-amd64 && \
     chmod 755 chamber && \
     ./chamber version
+
+RUN which curl
+
 # Use the official Debian slim image for a lean production container.
 # https://hub.docker.com/_/debian
 # https://docs.docker.com/develop/develop-images/multistage-build/#use-multi-stage-builds
@@ -33,5 +36,6 @@ RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -
 # Copy the binary to the production image from the builder stage.
 COPY --from=builder /app/peerbook /app/peerbook
 COPY --from=builder /app/chamber /usr/local/bin
+COPY --from=builder /usr/bin/curl /usr/bin
 
 CMD /usr/local/bin/chamber exec "${LAYER_NAME}" -- /app/peerbook
