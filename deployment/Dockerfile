@@ -21,8 +21,6 @@ RUN apt-get update && apt-get install -y curl && \
     chmod 755 chamber && \
     ./chamber version
 
-RUN which curl
-
 # Use the official Debian slim image for a lean production container.
 # https://hub.docker.com/_/debian
 # https://docs.docker.com/develop/develop-images/multistage-build/#use-multi-stage-builds
@@ -30,12 +28,11 @@ FROM debian:buster-slim
 ENV LAYER_NAME=""
 WORKDIR /app
 RUN set -x && apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    ca-certificates && \
+    curl ca-certificates && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy the binary to the production image from the builder stage.
 COPY --from=builder /app/peerbook /app/peerbook
 COPY --from=builder /app/chamber /usr/local/bin
-COPY --from=builder /usr/bin/curl /usr/bin
 
 CMD /usr/local/bin/chamber exec "${LAYER_NAME}" -- /app/peerbook
